@@ -27,7 +27,6 @@ import me.mrCookieSlime.Slimefun.Objects.handlers.BlockTicker;
 import org.apache.commons.lang.Validate;
 import org.bukkit.Chunk;
 import org.bukkit.Location;
-import org.bukkit.scheduler.BukkitScheduler;
 
 /**
  * The {@link TickerTask} is responsible for ticking every {@link BlockTicker},
@@ -68,8 +67,7 @@ public class TickerTask implements Runnable {
     public void start(@Nonnull Slimefun plugin) {
         this.tickRate = Slimefun.getCfg().getInt("URID.custom-ticker-delay");
 
-        BukkitScheduler scheduler = plugin.getServer().getScheduler();
-        scheduler.runTaskTimerAsynchronously(plugin, this, 100L, tickRate);
+        plugin.getPlatformScheduler().runTimerAsync(this, 100L, tickRate);
     }
 
     /**
@@ -167,12 +165,14 @@ public class TickerTask implements Runnable {
                      * We are inserting a new timestamp because synchronized actions
                      * are always ran with a 50ms delay (1 game tick)
                      */
-                    Slimefun.runSync(() -> {
-                        if (blockData.isPendingRemove()) {
-                            return;
-                        }
-                        tickBlock(l, item, blockData, System.nanoTime());
-                    });
+                    Slimefun.runSync(
+                            () -> {
+                                if (blockData.isPendingRemove()) {
+                                    return;
+                                }
+                                tickBlock(l, item, blockData, System.nanoTime());
+                            },
+                            l);
                 } else {
                     long timestamp = Slimefun.getProfiler().newEntry();
                     item.getBlockTicker().update();
@@ -205,12 +205,14 @@ public class TickerTask implements Runnable {
                      * We are inserting a new timestamp because synchronized actions
                      * are always ran with a 50ms delay (1 game tick)
                      */
-                    Slimefun.runSync(() -> {
-                        if (data.isPendingRemove()) {
-                            return;
-                        }
-                        tickBlock(l, item, data, System.nanoTime());
-                    });
+                    Slimefun.runSync(
+                            () -> {
+                                if (data.isPendingRemove()) {
+                                    return;
+                                }
+                                tickBlock(l, item, data, System.nanoTime());
+                            },
+                            l);
                 } else {
                     long timestamp = Slimefun.getProfiler().newEntry();
                     item.getBlockTicker().update();
