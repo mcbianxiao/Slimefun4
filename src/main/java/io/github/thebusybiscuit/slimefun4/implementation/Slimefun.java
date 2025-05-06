@@ -424,7 +424,7 @@ public final class Slimefun extends JavaPlugin implements SlimefunAddon, ICompat
                                         + ")");
                     }
                 }),
-                0);
+                1);
 
         // Setting up our commands
         try {
@@ -1158,7 +1158,7 @@ public final class Slimefun extends JavaPlugin implements SlimefunAddon, ICompat
             return null;
         }
 
-        return instance.getPlatformScheduler().runLater(runnable, delay);
+        return getPlatformScheduler().runLater(runnable, Math.max(1, delay));
     }
 
     /**
