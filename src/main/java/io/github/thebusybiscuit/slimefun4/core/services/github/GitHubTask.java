@@ -39,7 +39,7 @@ class GitHubTask implements Runnable {
     @Override
     public void run() {
 
-        if (!Slimefun.folia().isFolia() && Bukkit.isPrimaryThread()) {
+        if (Bukkit.isPrimaryThread()) {
             Slimefun.logger().log(Level.SEVERE, "The contributors task may never run on the main Thread!");
             return;
         }
@@ -118,6 +118,7 @@ class GitHubTask implements Runnable {
                                 Level.WARNING,
                                 "Attempted to refresh skin cache, got this response: {0}: {1}",
                                 new Object[] {x.getClass().getSimpleName(), x.getMessage()});
+                Slimefun.logger().log(Level.WARNING, "Error during refreshing skin cache", x);
                 Slimefun.logger()
                         .log(
                                 Level.WARNING,

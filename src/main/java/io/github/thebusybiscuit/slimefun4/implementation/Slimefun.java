@@ -307,10 +307,9 @@ public final class Slimefun extends JavaPlugin implements SlimefunAddon, ICompat
         Logger logger = getLogger();
 
         // Check if Paper (<3) is installed
-        if (PaperLib.isPaper()) {
-            logger.log(Level.INFO, "检测到你正在使用 Paper 服务端! 性能优化已应用.");
-        } else {
-            LangUtil.suggestPaper(this);
+        if (!PaperLib.isPaper() && !foliaLib.isFolia()) {
+            logger.log(Level.INFO, "Slimefun 无法在非 Paper 类服务端上使用, 正在关闭...");
+            return;
         }
 
         // Check if CS-CoreLib is installed (it is no longer needed)
@@ -346,7 +345,7 @@ public final class Slimefun extends JavaPlugin implements SlimefunAddon, ICompat
             Slimefun.logger().warning("请在服务器加载完成后, 使用 /sf migrate confirm 进行迁移!");
             Slimefun.logger().warning("如果不迁移, 你将会丢失先前版本的数据!!!");
             Slimefun.logger().warning("\n");
-            Slimefun.logger().warning("需要使用 MySQL 数据库的用户, 请关服后修改两个配置文件");
+            Slimefun.logger().warning("需要使用 MySQL 数据库的用户, 请关服后修改以下配置文件再进行迁移");
             Slimefun.logger().warning("block-storage.yml 和 profile-storage.yml");
             Slimefun.logger().warning("\n");
             Slimefun.logger().warning("====================================================");

@@ -151,57 +151,33 @@ public class TickerTask implements Runnable {
 
         SlimefunItem item = SlimefunItem.getById(blockData.getSfId());
 
-        if (item != null && item.getBlockTicker() != null) {
-            if (item.isDisabledIn(l.getWorld())) {
-                return;
-            }
-
-            try {
-                if (item.getBlockTicker().isSynchronized()) {
-                    Slimefun.getProfiler().scheduleEntries(1);
-                    item.getBlockTicker().update();
-
-                    /**
-                     * We are inserting a new timestamp because synchronized actions
-                     * are always ran with a 50ms delay (1 game tick)
-                     */
-                    Slimefun.runSync(
-                            () -> {
-                                if (blockData.isPendingRemove()) {
-                                    return;
-                                }
-                                tickBlock(l, item, blockData, System.nanoTime());
-                            },
-                            l);
-                } else {
-                    long timestamp = Slimefun.getProfiler().newEntry();
-                    item.getBlockTicker().update();
-
-                    if (Slimefun.folia().isFolia()) {
-                        Slimefun.getPlatformScheduler().runAtLocation(l, task -> tickBlock(l, item, blockData, timestamp));
-                    } else {
-                        tickBlock(l, item, blockData, timestamp);
-                    }
-                }
-
-                tickers.add(item.getBlockTicker());
-            } catch (Exception x) {
-                reportErrors(l, item, x);
-            }
+        if (item == null) {
+            return;
         }
+
+        callBlockTicker(l, item, blockData, tickers);
     }
 
     @ParametersAreNonnullByDefault
     private void tickUniversalLocation(UUID uuid, Location l, @Nonnull Set<BlockTicker> tickers) {
-        var data = StorageCacheUtils.getUniversalBlock(uuid);
-
-        if (data == null || !data.isDataLoaded() || data.isPendingRemove()) {
+        var uniData = StorageCacheUtils.getUniversalBlock(uuid);
+        if (uniData == null || !uniData.isDataLoaded() || uniData.isPendingRemove()) {
             return;
         }
 
-        var item = SlimefunItem.getById(data.getSfId());
+        var item = SlimefunItem.getById(uniData.getSfId());
 
-        if (item != null && item.getBlockTicker() != null) {
+        if (item == null) {
+            return;
+        }
+
+        callBlockTicker(l, item, uniData, tickers);
+    }
+
+    @ParametersAreNonnullByDefault
+    private void callBlockTicker(
+            Location l, SlimefunItem item, ASlimefunDataContainer data, @Nonnull Set<BlockTicker> tickers) {
+        if (item.getBlockTicker() != null) {
             if (item.isDisabledIn(l.getWorld())) {
                 return;
             }
@@ -441,8 +417,7 @@ public class TickerTask implements Runnable {
      * This method disables the ticker at the given {@link UUID} and removes it from our internal
      * "queue".
      *
-     * DO NOT USE THIS until you cannot disable by location,
-     * or enjoy extremely slow.
+     * We don't recommend disable by this way unless you only have UUID of universal data.
      *
      * @param uuid
      *            The {@link UUID} to remove
