@@ -54,7 +54,7 @@ public final class SlimefunExtended {
             sf.getLogger().log(Level.WARNING, "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!");
             sf.getLogger().log(Level.WARNING, "");
             sf.getLogger().log(Level.WARNING, "#######################################################");
-            return false;
+            return true;
         }
 
         if (Slimefun.getConfigManager().isBypassEnvironmentCheck()) {
