@@ -19,11 +19,8 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          distribution: 'zulu'
-          java-version: ${{ vars.JAVA_CI_VERSION }}
-          java-package: jdk
-          architecture: x64
-          cache: maven
+          distribution: temurin
+          java-version: 21
       - name: Codestyle check
         run: mvn -s .mvn/settings.xml -B spotless:check --errors
       - name: Build Slimefun
